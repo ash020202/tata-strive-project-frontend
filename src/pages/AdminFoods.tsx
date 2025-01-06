@@ -47,7 +47,7 @@ const AdminFoods = () => {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<Food>();
 
   const onSubmit = async (data: Food) => {
@@ -61,10 +61,10 @@ const AdminFoods = () => {
         const updatedFood = { ...data, id: editingFood.id };
 
         // Safely call the updateFood function with a non-undefined ID
-         await updateFood(editingFood.id, updatedFood);
+        await updateFood(editingFood.id, updatedFood);
         toast.success("Food updated successfully.");
         // console.log(response);
-        
+
         // Update the food list in the state
         setFoods(
           foods.map((food) => (food.id === editingFood.id ? updatedFood : food))
@@ -139,8 +139,9 @@ const AdminFoods = () => {
       {/* Blur Background Overlay */}
       {showForm && (
         <div
-          className={`${showForm ? "fixed" : ""} inset-0 bg-black/50 backdrop-blur-sm z-10`}
-         
+          className={`${
+            showForm ? "fixed" : ""
+          } inset-0 bg-black/50 backdrop-blur-sm z-10`}
         >
           <form
             onSubmit={handleSubmit(onSubmit)}
@@ -229,9 +230,16 @@ const AdminFoods = () => {
 
             <button
               type="submit"
+              disabled={isSubmitting}
               className="mt-4 bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700"
             >
-              {editingFood ? "Update Food" : "Add Food"}
+              {editingFood
+                ? isSubmitting
+                  ? "Updating..."
+                  : "Update Food"
+                : isSubmitting
+                ? "Adding..."
+                : "Add Food"}
             </button>
             <button
               type="button"
@@ -262,7 +270,6 @@ const AdminFoods = () => {
         </button>
       </div>
 
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {foods.map((food) => (
           <div key={food.id} className="bg-white p-4 rounded-lg shadow">
@@ -292,7 +299,7 @@ const AdminFoods = () => {
             </span>
 
             <div className="mt-4 flex justify-between items-center">
-              <span className="text-lg font-bold">${food.price}</span>
+              <span className="text-lg font-bold">₹{food.price}</span>
               <div className="space-x-2">
                 <button
                   onClick={() => {
